@@ -1,73 +1,163 @@
-# Welcome to your Lovable project
+# Uncertainty Lab
 
-## Project info
+A computational laboratory for mathematical finance, volatility surfaces, and uncertainty modelling.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🔬 Overview
 
-## How can I edit this code?
+Uncertainty Lab is a personal research platform for studying:
+- Volatility surfaces and implied volatility
+- Kernel regression and non-parametric estimation
+- Monte Carlo methods and option pricing
+- Model risk and calibration
+- Arbitrage detection and bounds checking
 
-There are several ways of editing your application.
+This is **not** a trading platform or financial advisory tool. It is designed for research, experimentation, and reproducibility.
 
-**Use Lovable**
+## 🚀 Quick Start
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### Local Development
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+# Frontend
+cd frontend
+npm install
 npm run dev
+# Open http://localhost:8080
+
+# Backend (in another terminal)
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 ```
 
-**Edit a file directly in GitHub**
+### Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Copy `.env.example` to `.env`:
 
-**Use GitHub Codespaces**
+```bash
+cp .env.example .env
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Configure:
+- `VITE_API_URL`: Backend API endpoint (default: `http://localhost:8000`)
+- `VITE_BASE_PATH`: Base path for deployment (empty for custom domain)
 
-## What technologies are used for this project?
+## 📦 Deployment to GitHub Pages
 
-This project is built with:
+### Option 1: Using GitHub Actions (Recommended)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. **Push to GitHub**
+   ```bash
+   git remote add origin https://github.com/angusmit/uncertaintylab.git
+   git push -u origin main
+   ```
 
-## How can I deploy this project?
+2. **Configure GitHub Pages**
+   - Go to repo Settings → Pages
+   - Set Source to "GitHub Actions"
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+3. **Automatic Deployment**
+   - Push to `main` branch triggers automatic deployment
+   - Or manually trigger via Actions tab → Deploy to GitHub Pages → Run workflow
 
-## Can I connect a custom domain to my Lovable project?
+### Option 2: Manual Deployment
 
-Yes, you can!
+```bash
+# Build for production
+npm run build
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+# The dist/ folder contains static files to deploy
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Domain Options
+
+**Custom Domain (uncertaintylab.github.io):**
+- Create organization named `uncertaintylab` on GitHub
+- Push to `uncertaintylab.github.io` repo
+- No base path needed
+
+**User Repo (angusmit.github.io/uncertaintylab):**
+- Set `VITE_BASE_PATH=/uncertaintylab/` in environment
+- Push to `uncertaintylab` repo under your account
+
+## 📂 Project Structure
+
+```
+frontend/
+├── src/
+│   ├── components/       # UI components
+│   │   ├── dashboard/    # Dashboard layout
+│   │   ├── ui/          # shadcn components
+│   │   └── PendingPage.tsx
+│   ├── pages/           # Page components
+│   │   ├── About.tsx
+│   │   ├── Methods.tsx
+│   │   ├── Publications.tsx
+│   │   ├── Explore.tsx
+│   │   └── app/         # Dashboard pages
+│   │       ├── DataImport.tsx
+│   │       ├── VolSurface.tsx
+│   │       └── Pricer.tsx
+│   └── lib/
+│       └── api/         # API client & hooks
+├── .github/workflows/   # GitHub Actions
+├── public/              # Static assets
+└── vite.config.ts       # Vite configuration
+```
+
+## 🧮 Features
+
+### Data Import
+- Single and multi-CSV import
+- Flexible column mapping
+- Strike suffix parsing (e.g., "62.5C")
+- Synthetic bid/ask generation
+- No-arbitrage bounds checking
+
+### Volatility Surface
+- Nadaraya-Watson kernel regression
+- Adjustable bandwidths (hₓ, hᵧ)
+- 3D surface visualization
+- Smile animations by expiry
+- Heatmap view
+
+### Pricing
+- Black-Scholes analytical pricing
+- Monte Carlo simulation
+- Asian and barrier options
+- Convergence analysis
+
+## 📖 Pages
+
+| Page | Path | Description |
+|------|------|-------------|
+| Home | `/` | Landing page |
+| Explore | `/explore` | Sandbox for experiments |
+| Data Import | `/app/data` | CSV import workspace |
+| Vol Surface | `/app/surface` | Surface visualization |
+| Pricer | `/app/pricer` | Option pricing tools |
+| Methods | `/methods` | Scientific methodology |
+| Publications | `/publications` | Research papers |
+| About | `/about` | Project information |
+
+## 🛠️ Tech Stack
+
+- **React 18** + TypeScript
+- **Vite** for build tooling
+- **Tailwind CSS** for styling
+- **shadcn/ui** for components
+- **Plotly.js** + Recharts for visualization
+- **React Query** for data fetching
+- **Framer Motion** for animations
+
+## 📜 License
+
+This project is for academic and educational purposes only. Not intended for trading or financial advice.
+
+## 👤 Author
+
+**Angus**
+
+---
+
+*Uncertainty Lab - A computational laboratory for mathematical finance.*
