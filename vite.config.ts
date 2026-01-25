@@ -28,15 +28,7 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: 'dist',
-      sourcemap: mode === 'development',
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: ['react', 'react-dom', 'react-router-dom'],
-            charts: ['recharts', 'plotly.js'],
-          },
-        },
-      },
+      sourcemap: false,
     },
   };
 });
