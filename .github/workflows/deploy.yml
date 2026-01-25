@@ -44,7 +44,7 @@ jobs:
         env:
           # For custom domain (uncertaintylab.github.io), leave empty
           # For repo path (angusmit.github.io/uncertaintylab), use /uncertaintylab/
-          VITE_BASE_PATH: ''
+          VITE_BASE_PATH: '/uncertaintylab/'
           # API URL - set to your backend URL
           VITE_API_URL: 'https://api.uncertaintylab.io'
 
