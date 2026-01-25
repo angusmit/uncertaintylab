@@ -23,6 +23,9 @@ const queryClient = new QueryClient({
   },
 });
 
+// Get base path from Vite config (for GitHub Pages subdirectory deployment)
+const basePath = import.meta.env.BASE_URL || '/';
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -37,7 +40,7 @@ const App = () => (
           },
         }}
       />
-      <BrowserRouter>
+      <BrowserRouter basename={basePath}>
         <Routes>
           {/* Landing Page */}
           <Route path="/" element={<Index />} />

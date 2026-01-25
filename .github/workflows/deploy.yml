@@ -42,11 +42,13 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # For custom domain (uncertaintylab.github.io), leave empty
-          # For repo path (angusmit.github.io/uncertaintylab), use /uncertaintylab/
-          VITE_BASE_PATH: '/uncertaintylab/'
-          # API URL - set to your backend URL
-          VITE_API_URL: 'https://api.uncertaintylab.io'
+          # For subdirectory deployment (angusmit.github.io/uncertaintylab)
+          VITE_BASE_PATH: /uncertaintylab/
+          # API URL - leave empty for frontend-only demo
+          VITE_API_URL: ''
+
+      - name: Copy index.html to 404.html for SPA routing
+        run: cp dist/index.html dist/404.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
