@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { FlaskConical, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import Logo from '@/components/Logo';
 
 const navItems = [
   { label: 'Explore', href: '/explore' },
@@ -26,16 +27,8 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto">
         <div className="glass-card px-6 py-3 flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors pulse-glow">
-              <FlaskConical className="w-5 h-5 text-primary" />
-            </div>
-            <span className="text-xl font-semibold tracking-tight">
-              <span className="gradient-text">Uncertainty</span>
-              <span className="text-foreground"> Lab</span>
-            </span>
-          </Link>
+          {/* Logo - Always links to homepage */}
+          <Logo size="md" />
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-6">

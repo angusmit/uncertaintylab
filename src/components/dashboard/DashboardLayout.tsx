@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FlaskConical,
   Database,
   LineChart,
   Calculator,
@@ -18,10 +17,10 @@ import {
   BookOpen,
   FileText,
   Info,
-  Home,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDiagnostics } from '@/lib/api/hooks';
+import Logo from '@/components/Logo';
 
 const navItems = [
   { label: 'Explore', href: '/explore', icon: Sparkles },
@@ -52,26 +51,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         transition={{ duration: 0.3 }}
         className="fixed left-0 top-0 h-full bg-sidebar border-r border-sidebar-border z-40 flex flex-col"
       >
-        {/* Logo */}
+        {/* Logo - Always links to homepage */}
         <div className="h-16 flex items-center px-4 border-b border-sidebar-border">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
-              <FlaskConical className="w-5 h-5 text-primary" />
-            </div>
-            <AnimatePresence mode="wait">
-              {!collapsed && (
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="text-lg font-semibold"
-                >
-                  <span className="gradient-text">Uncertainty</span>
-                  <span> Lab</span>
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </Link>
+          <Logo size="md" showText={!collapsed} />
         </div>
 
         {/* Navigation */}

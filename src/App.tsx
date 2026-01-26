@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
+import AppLayout from "./components/AppLayout";
 import DataImportPage from "./pages/app/DataImport";
 import VolSurfacePage from "./pages/app/VolSurface";
 import PricerPage from "./pages/app/Pricer";
@@ -42,14 +43,30 @@ const App = () => (
       />
       <BrowserRouter basename={basePath}>
         <Routes>
-          {/* Landing Page */}
+          {/* Landing Page - with transparent header */}
           <Route path="/" element={<Index />} />
           
-          {/* Static Pages */}
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/methods" element={<MethodsPage />} />
-          <Route path="/publications" element={<PublicationsPage />} />
-          <Route path="/explore" element={<ExplorePage />} />
+          {/* Static Pages - with standard header */}
+          <Route path="/about" element={
+            <AppLayout>
+              <AboutPage />
+            </AppLayout>
+          } />
+          <Route path="/methods" element={
+            <AppLayout>
+              <MethodsPage />
+            </AppLayout>
+          } />
+          <Route path="/publications" element={
+            <AppLayout>
+              <PublicationsPage />
+            </AppLayout>
+          } />
+          <Route path="/explore" element={
+            <AppLayout>
+              <ExplorePage />
+            </AppLayout>
+          } />
           
           {/* App Routes with Dashboard Layout */}
           <Route
@@ -86,7 +103,11 @@ const App = () => (
           />
           
           {/* 404 */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={
+            <AppLayout showFooter={false}>
+              <NotFound />
+            </AppLayout>
+          } />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

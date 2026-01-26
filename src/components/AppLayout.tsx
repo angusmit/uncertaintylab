@@ -7,11 +7,12 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FlaskConical, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Footer from './Footer';
+import Logo from './Logo';
 
 const navItems = [
   { label: 'Explore', href: '/explore' },
@@ -54,20 +55,8 @@ export default function AppLayout({
             'flex items-center justify-between',
             transparentHeader && 'glass-card px-4 md:px-6 py-3 rounded-xl'
           )}>
-            {/* Logo - Always links to home */}
-            <Link 
-              to="/" 
-              className="flex items-center gap-2 md:gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-lg p-1 -m-1"
-              aria-label="Uncertainty Lab - Go to homepage"
-            >
-              <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors pulse-glow">
-                <FlaskConical className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-              </div>
-              <span className="text-lg md:text-xl font-semibold tracking-tight">
-                <span className="gradient-text">Uncertainty</span>
-                <span className="text-foreground"> Lab</span>
-              </span>
-            </Link>
+            {/* Logo - Always links to homepage */}
+            <Logo size="md" />
 
             {/* Desktop Nav */}
             <nav className="hidden lg:flex items-center gap-1">
