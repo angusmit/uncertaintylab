@@ -45,7 +45,7 @@ jobs:
           # For subdirectory deployment (angusmit.github.io/uncertaintylab)
           VITE_BASE_PATH: /uncertaintylab/
           # API URL - leave empty for frontend-only demo
-          VITE_API_URL: ''
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
 
       - name: Copy index.html to 404.html for SPA routing
         run: cp dist/index.html dist/404.html
