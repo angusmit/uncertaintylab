@@ -11,6 +11,7 @@
  * - This ID is stored ONLY in memory (window object)
  * - If the stored session ID doesn't match, state is cleared
  * - This ensures state resets even if browser restores sessionStorage
+ * - Backend state is also reset via API call
  * 
  * This store manages:
  * - Active data import mode (synthetic/csv/multi-csv)
@@ -23,6 +24,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { useState, useEffect } from 'react';
 import type { CSVColumnMapping, ImportDiagnostics, PerExpiryDiagnostics } from '@/lib/api/hooks';
 
 // =============================================================================
@@ -35,6 +37,9 @@ const CURRENT_SESSION_ID = `session-${Date.now()}-${Math.random().toString(36).s
 
 // Key used to store the session ID in sessionStorage
 const SESSION_ID_KEY = 'uncertainty-lab-session-id';
+
+// Flag to track if we need to reset backend
+let pendingBackendReset = false;
 
 /**
  * Check if this is a new browser session
@@ -60,8 +65,43 @@ function clearIfNewSession(): void {
   if (isNewSession()) {
     // Clear the persisted store data
     sessionStorage.removeItem('uncertainty-lab-session-v1');
+    // Mark that we need to reset backend when possible
+    pendingBackendReset = true;
     console.log('[LabSession] New session detected, cleared previous state');
   }
+}
+
+/**
+ * Reset backend state if needed
+ * Called from React components after API is available
+ */
+export async function resetBackendIfNeeded(apiBaseUrl: string): Promise<boolean> {
+  if (!pendingBackendReset) return false;
+  
+  pendingBackendReset = false;
+  
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/v1/reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    
+    if (response.ok) {
+      console.log('[LabSession] Backend state reset for new session');
+      return true;
+    }
+  } catch (error) {
+    console.warn('[LabSession] Failed to reset backend:', error);
+  }
+  
+  return false;
+}
+
+/**
+ * Check if backend reset is pending
+ */
+export function isBackendResetPending(): boolean {
+  return pendingBackendReset;
 }
 
 // Run session check on module load
@@ -335,4 +375,27 @@ export function useSessionInfo() {
     sessionAge: getRelativeTime(sessionStarted),
     lastUpdated: getRelativeTime(lastUpdated),
   };
+}
+
+/**
+ * Hook to initialize session and reset backend if needed
+ * Should be called once at app startup
+ */
+export function useSessionInit(apiBaseUrl: string) {
+  const [initialized, setInitialized] = useState(false);
+  const [didReset, setDidReset] = useState(false);
+  
+  useEffect(() => {
+    if (initialized) return;
+    
+    const init = async () => {
+      const wasReset = await resetBackendIfNeeded(apiBaseUrl);
+      setDidReset(wasReset);
+      setInitialized(true);
+    };
+    
+    init();
+  }, [apiBaseUrl, initialized]);
+  
+  return { initialized, didReset };
 }
