@@ -6,6 +6,12 @@
  * - State resets when tab is closed or browser is restarted
  * - Does NOT use localStorage (no persistence across sessions)
  * 
+ * Session Validation:
+ * - A unique session ID is generated on each page load
+ * - This ID is stored ONLY in memory (window object)
+ * - If the stored session ID doesn't match, state is cleared
+ * - This ensures state resets even if browser restores sessionStorage
+ * 
  * This store manages:
  * - Active data import mode (synthetic/csv/multi-csv)
  * - Synthetic chain parameters
@@ -18,6 +24,48 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { CSVColumnMapping, ImportDiagnostics, PerExpiryDiagnostics } from '@/lib/api/hooks';
+
+// =============================================================================
+// Session Validation
+// =============================================================================
+
+// Generate a unique session ID for this page load
+// This is stored ONLY in memory, never persisted
+const CURRENT_SESSION_ID = `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+// Key used to store the session ID in sessionStorage
+const SESSION_ID_KEY = 'uncertainty-lab-session-id';
+
+/**
+ * Check if this is a new browser session
+ * Returns true if we should clear persisted state
+ */
+function isNewSession(): boolean {
+  const storedSessionId = sessionStorage.getItem(SESSION_ID_KEY);
+  
+  if (!storedSessionId || storedSessionId !== CURRENT_SESSION_ID) {
+    // New session detected - update the stored ID
+    sessionStorage.setItem(SESSION_ID_KEY, CURRENT_SESSION_ID);
+    return storedSessionId !== null; // Only clear if there was old data
+  }
+  
+  return false;
+}
+
+/**
+ * Clear session data if this is a new browser session
+ * Called on module initialization
+ */
+function clearIfNewSession(): void {
+  if (isNewSession()) {
+    // Clear the persisted store data
+    sessionStorage.removeItem('uncertainty-lab-session-v1');
+    console.log('[LabSession] New session detected, cleared previous state');
+  }
+}
+
+// Run session check on module load
+clearIfNewSession();
 
 // =============================================================================
 // Types
