@@ -12,6 +12,8 @@
  * - Price source selection
  * - Bounds checking toggle
  * - Full diagnostics panel with warnings
+ * 
+ * State is persisted to sessionStorage for continuity across route changes.
  */
 
 import { useState, useCallback, useMemo } from 'react';
@@ -32,6 +34,7 @@ import {
   X,
   Calendar,
   Trash2,
+  RotateCcw,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -60,6 +63,7 @@ import {
   useImportCSV,
   useDetectMultiCSV,
   useImportMultiCSV,
+  useResetState,
   CSVDetectResponse,
   CSVColumnMapping,
   ImportDiagnostics,
@@ -68,6 +72,7 @@ import {
   PerExpiryDiagnostics,
 } from '@/lib/api/hooks';
 import { cn } from '@/lib/utils';
+import { useLabSessionStore, useSessionInfo, type DataMode } from '@/state/labSessionStore';
 
 // Price source options
 const PRICE_SOURCES = [
@@ -79,18 +84,51 @@ const PRICE_SOURCES = [
 ] as const;
 
 export default function DataImportPage() {
-  const [activeTab, setActiveTab] = useState('synthetic');
+  const dataMode = useLabSessionStore((state) => state.dataMode);
+  const setDataMode = useLabSessionStore((state) => state.setDataMode);
+  const resetSession = useLabSessionStore((state) => state.resetSession);
+  const resetBackend = useResetState();
+  const { sessionAge } = useSessionInfo();
+
+  const handleResetSession = async () => {
+    try {
+      // Reset backend state
+      await resetBackend.mutateAsync();
+      // Reset frontend session state
+      resetSession();
+      toast.success('Session reset to defaults');
+    } catch (error) {
+      toast.error('Failed to reset session');
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Data Import</h1>
-        <p className="text-muted-foreground">
-          Load option chain data from CSV or generate synthetic data for experiments
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Data Import</h1>
+          <p className="text-muted-foreground">
+            Load option chain data from CSV or generate synthetic data for experiments
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-muted-foreground">
+            Session: {sessionAge}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleResetSession}
+            disabled={resetBackend.isPending}
+            className="gap-2"
+          >
+            <RotateCcw className="w-3 h-3" />
+            Reset Session
+          </Button>
+        </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={dataMode} onValueChange={(v) => setDataMode(v as DataMode)} className="w-full">
         <TabsList className="grid w-full grid-cols-3 max-w-lg">
           <TabsTrigger value="synthetic" className="gap-2">
             <Sparkles className="w-4 h-4" />
@@ -127,17 +165,9 @@ export default function DataImportPage() {
 // =============================================================================
 
 function SyntheticChainForm() {
-  const [params, setParams] = useState({
-    spot: 100,
-    rate: 0.05,
-    div_yield: 0.02,
-    base_vol: 0.2,
-    skew: -0.1,
-    smile: 0.1,
-    term_slope: -0.02,
-    n_strikes: 15,
-    n_expiries: 6,
-  });
+  // Use session store for parameters
+  const params = useLabSessionStore((state) => state.syntheticParams);
+  const setParams = useLabSessionStore((state) => state.setSyntheticParams);
 
   const createChain = useCreateSyntheticChain();
   const computeIV = useComputeIV();
@@ -155,7 +185,7 @@ function SyntheticChainForm() {
   };
 
   const updateParam = (key: string, value: number) => {
-    setParams((prev) => ({ ...prev, [key]: value }));
+    setParams({ [key]: value });
   };
 
   return (
@@ -336,43 +366,30 @@ function SyntheticChainForm() {
 // =============================================================================
 
 function CSVImportWorkspace() {
-  // File state
+  // File state (not persisted - files can't be serialized)
   const [file, setFile] = useState<File | null>(null);
   const [csvData, setCsvData] = useState<string>('');
   const [detectResult, setDetectResult] = useState<CSVDetectResponse | null>(null);
 
-  // Column mapping state
-  const [mapping, setMapping] = useState<Partial<CSVColumnMapping>>({
-    price_source: 'bid_ask_mid',
-    strike_has_suffix: false,
-  });
+  // Session store for persisted state
+  const mapping = useLabSessionStore((state) => state.csvMapping);
+  const setMapping = useLabSessionStore((state) => state.setCSVMapping);
+  const expiryMode = useLabSessionStore((state) => state.expiryMode);
+  const setExpiryMode = useLabSessionStore((state) => state.setExpiryMode);
+  const expiryDate = useLabSessionStore((state) => state.expiryDate);
+  const setExpiryDate = useLabSessionStore((state) => state.setExpiryDate);
+  const expiryT = useLabSessionStore((state) => state.expiryT);
+  const setExpiryT = useLabSessionStore((state) => state.setExpiryT);
+  const marketParams = useLabSessionStore((state) => state.marketParams);
+  const setMarketParams = useLabSessionStore((state) => state.setMarketParams);
+  const checkBounds = useLabSessionStore((state) => state.checkBounds);
+  const setCheckBounds = useLabSessionStore((state) => state.setCheckBounds);
+  const syntheticSpread = useLabSessionStore((state) => state.syntheticSpread);
+  const setSyntheticSpread = useLabSessionStore((state) => state.setSyntheticSpread);
+  const importResult = useLabSessionStore((state) => state.csvImportResult);
+  const setImportResult = useLabSessionStore((state) => state.setCSVImportResult);
 
-  // Expiry override state
-  const [expiryMode, setExpiryMode] = useState<'column' | 'date' | 'T'>('column');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [expiryT, setExpiryT] = useState(0.25);
-
-  // Market parameters
-  const [marketParams, setMarketParams] = useState({
-    spot: 100,
-    rate: 0.05,
-    div_yield: 0.02,
-  });
-
-  // Options
-  const [checkBounds, setCheckBounds] = useState(true);
-  const [syntheticSpread, setSyntheticSpread] = useState({
-    enabled: false,
-    spread_pct: 0.02,
-  });
-
-  // Import results
-  const [importResult, setImportResult] = useState<{
-    diagnostics: ImportDiagnostics;
-    warnings: string[];
-  } | null>(null);
-
-  // Advanced section state
+  // Advanced section state (UI only, not persisted)
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
   // Hooks
@@ -500,7 +517,7 @@ function CSVImportWorkspace() {
       <Label className="text-sm">{label}</Label>
       <Select
         value={(mapping[field] as string) || '__none__'}
-        onValueChange={(v) => setMapping((m) => ({ ...m, [field]: v === '__none__' ? undefined : v }))}
+        onValueChange={(v) => setMapping({ [field]: v === '__none__' ? undefined : v })}
       >
         <SelectTrigger className="h-9">
           <SelectValue placeholder={placeholder} />
@@ -620,7 +637,7 @@ function CSVImportWorkspace() {
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
               <Switch
                 checked={mapping.strike_has_suffix || false}
-                onCheckedChange={(checked) => setMapping((m) => ({ ...m, strike_has_suffix: checked }))}
+                onCheckedChange={(checked) => setMapping({ strike_has_suffix: checked })}
               />
               <div>
                 <Label className="font-medium">Strike contains C/P suffix</Label>
@@ -635,7 +652,7 @@ function CSVImportWorkspace() {
               <Label>Primary Price Source</Label>
               <Select
                 value={mapping.price_source || 'bid_ask_mid'}
-                onValueChange={(v) => setMapping((m) => ({ ...m, price_source: v as any }))}
+                onValueChange={(v) => setMapping({ price_source: v as any })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -716,7 +733,7 @@ function CSVImportWorkspace() {
               <div className="flex items-center gap-3">
                 <Switch
                   checked={syntheticSpread.enabled}
-                  onCheckedChange={(checked) => setSyntheticSpread((s) => ({ ...s, enabled: checked }))}
+                  onCheckedChange={(checked) => setSyntheticSpread({ enabled: checked })}
                 />
                 <div>
                   <Label className="font-medium">Generate Synthetic Bid/Ask</Label>
@@ -731,7 +748,7 @@ function CSVImportWorkspace() {
                   <Label className="text-sm">Spread %:</Label>
                   <Slider
                     value={[syntheticSpread.spread_pct * 100]}
-                    onValueChange={([v]) => setSyntheticSpread((s) => ({ ...s, spread_pct: v / 100 }))}
+                    onValueChange={([v]) => setSyntheticSpread({ spread_pct: v / 100 })}
                     min={0.5}
                     max={10}
                     step={0.5}
@@ -749,7 +766,7 @@ function CSVImportWorkspace() {
                 <Input
                   type="number"
                   value={marketParams.spot}
-                  onChange={(e) => setMarketParams((m) => ({ ...m, spot: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e) => setMarketParams({ spot: parseFloat(e.target.value) || 0 })}
                 />
               </div>
               <div className="space-y-2">
@@ -758,7 +775,7 @@ function CSVImportWorkspace() {
                   type="number"
                   step="0.01"
                   value={marketParams.rate}
-                  onChange={(e) => setMarketParams((m) => ({ ...m, rate: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e) => setMarketParams({ rate: parseFloat(e.target.value) || 0 })}
                 />
               </div>
               <div className="space-y-2">
@@ -767,7 +784,7 @@ function CSVImportWorkspace() {
                   type="number"
                   step="0.01"
                   value={marketParams.div_yield}
-                  onChange={(e) => setMarketParams((m) => ({ ...m, div_yield: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e) => setMarketParams({ div_yield: parseFloat(e.target.value) || 0 })}
                 />
               </div>
             </div>
@@ -971,38 +988,23 @@ interface FileWithData {
 }
 
 function MultiCSVImportWorkspace() {
-  // Files state
+  // Files state (not persisted - files can't be serialized)
   const [files, setFiles] = useState<FileWithData[]>([]);
   const [detectResult, setDetectResult] = useState<MultiCSVDetectResponse | null>(null);
 
-  // Column mapping state (shared across all files)
-  const [mapping, setMapping] = useState<Partial<CSVColumnMapping>>({
-    price_source: 'bid_ask_mid',
-    strike_has_suffix: false,
-  });
+  // Session store for persisted state
+  const mapping = useLabSessionStore((state) => state.csvMapping);
+  const setMapping = useLabSessionStore((state) => state.setCSVMapping);
+  const marketParams = useLabSessionStore((state) => state.marketParams);
+  const setMarketParams = useLabSessionStore((state) => state.setMarketParams);
+  const checkBounds = useLabSessionStore((state) => state.checkBounds);
+  const setCheckBounds = useLabSessionStore((state) => state.setCheckBounds);
+  const syntheticSpread = useLabSessionStore((state) => state.syntheticSpread);
+  const setSyntheticSpread = useLabSessionStore((state) => state.setSyntheticSpread);
+  const importResult = useLabSessionStore((state) => state.multiCsvImportResult);
+  const setImportResult = useLabSessionStore((state) => state.setMultiCSVImportResult);
 
-  // Market parameters
-  const [marketParams, setMarketParams] = useState({
-    spot: 100,
-    rate: 0.05,
-    div_yield: 0.02,
-  });
-
-  // Options
-  const [checkBounds, setCheckBounds] = useState(true);
-  const [syntheticSpread, setSyntheticSpread] = useState({
-    enabled: false,
-    spread_pct: 0.02,
-  });
-
-  // Import results
-  const [importResult, setImportResult] = useState<{
-    perExpiry: PerExpiryDiagnostics[];
-    overall: Record<string, number | string>;
-    warnings: string[];
-  } | null>(null);
-
-  // Advanced section state
+  // Advanced section state (UI only, not persisted)
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
   // Hooks
@@ -1161,7 +1163,7 @@ function MultiCSVImportWorkspace() {
       <Label className="text-sm">{label}</Label>
       <Select
         value={(mapping[field] as string) || '__none__'}
-        onValueChange={(v) => setMapping((m) => ({ ...m, [field]: v === '__none__' ? undefined : v }))}
+        onValueChange={(v) => setMapping({ [field]: v === '__none__' ? undefined : v })}
       >
         <SelectTrigger className="h-9">
           <SelectValue placeholder={placeholder} />
@@ -1341,7 +1343,7 @@ function MultiCSVImportWorkspace() {
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
               <Switch
                 checked={mapping.strike_has_suffix || false}
-                onCheckedChange={(checked) => setMapping((m) => ({ ...m, strike_has_suffix: checked }))}
+                onCheckedChange={(checked) => setMapping({ strike_has_suffix: checked })}
               />
               <div>
                 <Label className="font-medium">Strike contains C/P suffix</Label>
@@ -1354,7 +1356,7 @@ function MultiCSVImportWorkspace() {
               <Label>Primary Price Source</Label>
               <Select
                 value={mapping.price_source || 'bid_ask_mid'}
-                onValueChange={(v) => setMapping((m) => ({ ...m, price_source: v as any }))}
+                onValueChange={(v) => setMapping({ price_source: v as any })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -1394,7 +1396,7 @@ function MultiCSVImportWorkspace() {
               <div className="flex items-center gap-3">
                 <Switch
                   checked={syntheticSpread.enabled}
-                  onCheckedChange={(checked) => setSyntheticSpread((s) => ({ ...s, enabled: checked }))}
+                  onCheckedChange={(checked) => setSyntheticSpread({ enabled: checked })}
                 />
                 <div>
                   <Label className="font-medium">Generate Synthetic Bid/Ask</Label>
@@ -1406,7 +1408,7 @@ function MultiCSVImportWorkspace() {
                   <Label className="text-sm">Spread %:</Label>
                   <Slider
                     value={[syntheticSpread.spread_pct * 100]}
-                    onValueChange={([v]) => setSyntheticSpread((s) => ({ ...s, spread_pct: v / 100 }))}
+                    onValueChange={([v]) => setSyntheticSpread({ spread_pct: v / 100 })}
                     min={0.5}
                     max={10}
                     step={0.5}
@@ -1424,7 +1426,7 @@ function MultiCSVImportWorkspace() {
                 <Input
                   type="number"
                   value={marketParams.spot}
-                  onChange={(e) => setMarketParams((m) => ({ ...m, spot: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e) => setMarketParams({ spot: parseFloat(e.target.value) || 0 })}
                 />
               </div>
               <div className="space-y-2">
@@ -1433,7 +1435,7 @@ function MultiCSVImportWorkspace() {
                   type="number"
                   step="0.01"
                   value={marketParams.rate}
-                  onChange={(e) => setMarketParams((m) => ({ ...m, rate: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e) => setMarketParams({ rate: parseFloat(e.target.value) || 0 })}
                 />
               </div>
               <div className="space-y-2">
@@ -1442,7 +1444,7 @@ function MultiCSVImportWorkspace() {
                   type="number"
                   step="0.01"
                   value={marketParams.div_yield}
-                  onChange={(e) => setMarketParams((m) => ({ ...m, div_yield: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e) => setMarketParams({ div_yield: parseFloat(e.target.value) || 0 })}
                 />
               </div>
             </div>
