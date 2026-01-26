@@ -2,6 +2,7 @@
  * Methods Page - Scientific backbone of Uncertainty Lab
  * 
  * Explains how the platform computes what you see
+ * Uses KaTeX for professional mathematical typesetting
  */
 
 import { motion } from 'framer-motion';
@@ -17,6 +18,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { MathBlock, MathInline } from '@/components/Math';
 
 interface MethodSectionProps {
   icon: React.ReactNode;
@@ -226,35 +228,75 @@ export default function MethodsPage() {
                 Key equations and formulations used in Uncertainty Lab
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-8">
+              {/* Black-Scholes */}
               <div>
-                <h4 className="font-medium text-foreground mb-2">Black-Scholes Formula</h4>
-                <p className="text-sm text-muted-foreground font-mono bg-muted/30 p-3 rounded-lg">
-                  C(S,K,T,r,q,σ) = S·e<sup>-qT</sup>·N(d₁) - K·e<sup>-rT</sup>·N(d₂)
-                </p>
+                <h4 className="font-medium text-foreground mb-3">Black-Scholes Formula</h4>
+                <MathBlock>
+                  {`C(S,K,T,r,q,\\sigma) = S e^{-qT} N(d_1) - K e^{-rT} N(d_2)`}
+                </MathBlock>
+                <p className="text-sm text-muted-foreground mb-2">where:</p>
+                <MathBlock>
+                  {`d_1 = \\frac{\\ln(S/K) + (r - q + \\sigma^2/2)T}{\\sigma\\sqrt{T}}, \\quad d_2 = d_1 - \\sigma\\sqrt{T}`}
+                </MathBlock>
                 <p className="text-xs text-muted-foreground mt-2">
-                  where d₁ = [ln(S/K) + (r - q + σ²/2)T] / (σ√T) and d₂ = d₁ - σ√T
+                  <MathInline>{`N(\\cdot)`}</MathInline> is the standard normal CDF, <MathInline>{`S`}</MathInline> is spot price, 
+                  <MathInline>{`K`}</MathInline> is strike, <MathInline>{`T`}</MathInline> is time to expiry, 
+                  <MathInline>{`r`}</MathInline> is risk-free rate, <MathInline>{`q`}</MathInline> is dividend yield, 
+                  and <MathInline>{`\\sigma`}</MathInline> is volatility.
                 </p>
               </div>
 
+              {/* Kernel Regression */}
               <div>
-                <h4 className="font-medium text-foreground mb-2">Kernel Regression Estimator</h4>
-                <p className="text-sm text-muted-foreground font-mono bg-muted/30 p-3 rounded-lg">
-                  σ̂(x,y) = Σᵢ Kₕ(x-xᵢ, y-yᵢ) · σᵢ / Σᵢ Kₕ(x-xᵢ, y-yᵢ)
-                </p>
+                <h4 className="font-medium text-foreground mb-3">Kernel Regression Estimator</h4>
+                <MathBlock>
+                  {`\\hat{\\sigma}(x,y) = \\frac{\\sum_i K_h(x - x_i, y - y_i) \\cdot \\sigma_i}{\\sum_i K_h(x - x_i, y - y_i)}`}
+                </MathBlock>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Nadaraya-Watson estimator with Gaussian kernel K and bandwidth h
+                  Nadaraya-Watson estimator with Gaussian kernel <MathInline>{`K_h`}</MathInline> and bandwidth <MathInline>{`h`}</MathInline>.
+                  Here <MathInline>{`x = \\ln(K/F)`}</MathInline> is log-moneyness and <MathInline>{`y = \\sqrt{T}`}</MathInline> is the square root of time to maturity.
                 </p>
               </div>
 
+              {/* SVI */}
               <div>
-                <h4 className="font-medium text-foreground mb-2">SVI Parameterization</h4>
-                <p className="text-sm text-muted-foreground font-mono bg-muted/30 p-3 rounded-lg">
-                  w(k) = a + b · [ρ(k-m) + √((k-m)² + σ²)]
-                </p>
+                <h4 className="font-medium text-foreground mb-3">SVI Parameterization</h4>
+                <MathBlock>
+                  {`w(k) = a + b \\left( \\rho(k - m) + \\sqrt{(k - m)^2 + \\sigma^2} \\right)`}
+                </MathBlock>
+                <p className="text-sm text-muted-foreground mb-2">where:</p>
+                <MathBlock>
+                  {`k = \\ln(K/F)`}
+                </MathBlock>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Total implied variance as function of log-moneyness k = ln(K/F)
+                  <MathInline>{`w(k)`}</MathInline> is total implied variance, <MathInline>{`a`}</MathInline> controls overall variance level,
+                  <MathInline>{`b`}</MathInline> controls the wings, <MathInline>{`\\rho`}</MathInline> is the correlation (skew),
+                  <MathInline>{`m`}</MathInline> shifts the smile, and <MathInline>{`\\sigma`}</MathInline> controls ATM curvature.
                 </p>
+              </div>
+
+              {/* Greeks */}
+              <div>
+                <h4 className="font-medium text-foreground mb-3">Option Greeks</h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-3 rounded-lg bg-muted/20">
+                    <p className="text-sm font-medium mb-2">Delta</p>
+                    <MathBlock>{`\\Delta = \\frac{\\partial C}{\\partial S} = e^{-qT} N(d_1)`}</MathBlock>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/20">
+                    <p className="text-sm font-medium mb-2">Gamma</p>
+                    <MathBlock>{`\\Gamma = \\frac{\\partial^2 C}{\\partial S^2} = \\frac{e^{-qT} N'(d_1)}{S \\sigma \\sqrt{T}}`}</MathBlock>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/20">
+                    <p className="text-sm font-medium mb-2">Vega</p>
+                    <MathBlock>{`\\mathcal{V} = \\frac{\\partial C}{\\partial \\sigma} = S e^{-qT} N'(d_1) \\sqrt{T}`}</MathBlock>
+                  </div>
+                  <div className="p-3 rounded-lg bg-muted/20">
+                    <p className="text-sm font-medium mb-2">Theta</p>
+                    <MathBlock>{`\\Theta = -\\frac{\\partial C}{\\partial T}`}</MathBlock>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

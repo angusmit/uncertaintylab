@@ -74,25 +74,25 @@ export default function PublicationsPage() {
   const publications: PublicationProps[] = [
     {
       title: 'Signature Methods for Stochastic Volatility Calibration',
-      authors: 'Angus',
+      authors: 'Angus Ng',
       status: 'in-preparation',
       abstract: 'This work explores the use of rough path signatures as feature extractors for volatility model calibration. We demonstrate how signature-based regression can efficiently capture the stylized facts of implied volatility surfaces while maintaining theoretical consistency with arbitrage-free constraints.',
     },
     {
       title: 'Roughness and Arbitrage in Implied Volatility Surfaces',
-      authors: 'Angus',
+      authors: 'Angus Ng',
       status: 'in-preparation',
       abstract: 'We investigate the relationship between path roughness in the underlying price process and the presence of arbitrage opportunities in the implied volatility surface. The analysis uses kernel regression methods to estimate local regularity and identifies regimes where classical arbitrage bounds are most likely to be violated.',
     },
     {
       title: 'Non-Parametric Surface Fitting with Adaptive Bandwidth Selection',
-      authors: 'Angus',
+      authors: 'Angus Ng',
       status: 'working-paper',
       abstract: 'A practical guide to kernel regression for implied volatility surfaces, with emphasis on bandwidth selection via cross-validation and the bias-variance tradeoff. We provide open-source implementations and discuss computational considerations for real-time applications.',
     },
     {
       title: 'Monte Carlo Methods for Exotic Option Pricing: A Pedagogical Approach',
-      authors: 'Angus',
+      authors: 'Angus Ng',
       status: 'working-paper',
       abstract: 'An educational treatment of Monte Carlo simulation for derivative pricing, covering variance reduction techniques, convergence analysis, and practical implementation details. Includes interactive visualizations and reproducible code examples.',
     },

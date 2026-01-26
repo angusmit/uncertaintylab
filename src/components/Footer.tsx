@@ -82,7 +82,7 @@ export default function Footer() {
         {/* Bottom */}
         <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Uncertainty Lab. A personal research platform by Angus.
+            © {new Date().getFullYear()} Uncertainty Lab. A personal research platform by Angus Ng.
           </p>
           <p className="text-xs text-muted-foreground">
             Computational laboratory for mathematical finance

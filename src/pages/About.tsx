@@ -48,7 +48,7 @@ export default function AboutPage() {
           <Card className="glass-card">
             <CardContent className="p-8 space-y-6">
               <p className="text-lg leading-relaxed text-foreground">
-                Uncertainty Lab is a personal research platform developed by Angus for the 
+                Uncertainty Lab is a personal research platform developed by Angus Ng for the 
                 study of volatility surfaces, implied volatility dynamics, and computational 
                 methods in quantitative finance.
               </p>
@@ -230,7 +230,7 @@ export default function AboutPage() {
           className="text-center pt-8 border-t border-border"
         >
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Uncertainty Lab. A personal research platform by Angus.
+            © {new Date().getFullYear()} Uncertainty Lab. A personal research platform by Angus Ng.
           </p>
           <p className="text-xs text-muted-foreground mt-2">
             For academic and experimental purposes only.
