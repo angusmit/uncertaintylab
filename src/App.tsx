@@ -15,6 +15,7 @@ import AboutPage from "./pages/About";
 import MethodsPage from "./pages/Methods";
 import PublicationsPage from "./pages/Publications";
 import ExplorePage from "./pages/Explore";
+import InverseFourierImageRestoration from "./pages/publications/InverseFourierImageRestoration";
 import { useSessionInit } from "./state/labSessionStore";
 import { API_BASE } from "./lib/api";
 
@@ -32,7 +33,8 @@ const basePath = import.meta.env.BASE_URL || '/';
 
 /**
  * Session initializer component
- * Resets backend state if this is a new browser session
+ * Resets backend state on every fresh page load
+ * Shows loading state until reset is complete to prevent stale data
  */
 function SessionInitializer({ children }: { children: React.ReactNode }) {
   const { initialized, didReset } = useSessionInit(API_BASE);
@@ -40,10 +42,21 @@ function SessionInitializer({ children }: { children: React.ReactNode }) {
   
   // Invalidate all queries after backend reset to refresh UI
   useEffect(() => {
-    if (didReset) {
-      queryClient.invalidateQueries();
+    if (initialized) {
+      // Clear all cached queries to ensure fresh data
+      queryClient.clear();
+      console.log('[LabSession] Query cache cleared');
     }
-  }, [didReset, queryClient]);
+  }, [initialized, queryClient]);
+  
+  // Show nothing until session is initialized (prevents stale data fetch)
+  if (!initialized) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">Initializing session...</div>
+      </div>
+    );
+  }
   
   return <>{children}</>;
 }
@@ -82,6 +95,11 @@ const App = () => (
             <Route path="/publications" element={
               <AppLayout>
                 <PublicationsPage />
+              </AppLayout>
+            } />
+            <Route path="/publications/inverse-fourier-image-restoration" element={
+              <AppLayout>
+                <InverseFourierImageRestoration />
               </AppLayout>
             } />
             <Route path="/explore" element={

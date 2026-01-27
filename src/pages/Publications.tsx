@@ -5,7 +5,8 @@
  */
 
 import { motion } from 'framer-motion';
-import { BookOpen, FileText, Clock, ExternalLink, GraduationCap } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { BookOpen, FileText, Clock, ArrowRight, GraduationCap, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -17,9 +18,10 @@ interface PublicationProps {
   year?: number;
   venue?: string;
   link?: string;
+  tags?: string[];
 }
 
-function Publication({ title, authors, status, abstract, year, venue, link }: PublicationProps) {
+function Publication({ title, authors, status, abstract, year, link, tags }: PublicationProps) {
   const statusConfig = {
     'in-preparation': { label: 'In Preparation', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' },
     'submitted': { label: 'Submitted', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
@@ -28,13 +30,14 @@ function Publication({ title, authors, status, abstract, year, venue, link }: Pu
   };
 
   const { label, color } = statusConfig[status];
+  const isPublished = status === 'published';
 
-  return (
-    <Card className="glass-card">
+  const content = (
+    <Card className={`glass-card transition-all ${isPublished ? 'hover:border-primary/40 cursor-pointer' : ''}`}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
               <FileText className="w-4 h-4 text-primary" />
               <Badge variant="outline" className={color}>
                 {label}
@@ -47,31 +50,52 @@ function Publication({ title, authors, status, abstract, year, venue, link }: Pu
             </div>
             <h3 className="font-semibold text-lg text-foreground mb-1">{title}</h3>
             <p className="text-sm text-muted-foreground mb-2">{authors}</p>
-            {venue && (
-              <p className="text-xs text-muted-foreground italic mb-3">{venue}</p>
+            {tags && tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-3">
+                {tags.map((tag, i) => (
+                  <Badge key={i} variant="outline" className="text-xs bg-muted/30">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
             )}
             {abstract && (
               <p className="text-sm text-muted-foreground leading-relaxed">{abstract}</p>
             )}
           </div>
-          {link && (
-            <a
-              href={link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 transition-colors"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </a>
+          {isPublished && link && (
+            <div className="text-primary">
+              <ArrowRight className="w-5 h-5" />
+            </div>
           )}
         </div>
       </CardContent>
     </Card>
   );
+
+  if (isPublished && link) {
+    return <Link to={link}>{content}</Link>;
+  }
+
+  return content;
 }
 
 export default function PublicationsPage() {
-  const publications: PublicationProps[] = [
+  // Published papers
+  const publishedPapers: PublicationProps[] = [
+    {
+      title: 'Image Restoration by the Inverse Fourier Transform',
+      authors: 'Angus Ng',
+      status: 'published',
+      year: 2025,
+      link: '/publications/inverse-fourier-image-restoration',
+      tags: ['Fourier Transform', 'Inverse Problems', 'Signal Processing', 'Foundations'],
+      abstract: 'This report presents the mathematical foundations of image restoration using the Fourier Transform and its inverse. We introduce the linear shift-invariant degradation model, derive the two-dimensional convolution theorem, and explain how inverse filtering in the frequency domain can recover a degraded image.',
+    },
+  ];
+
+  // Working papers and drafts
+  const workingPapers: PublicationProps[] = [
     {
       title: 'Signature Methods for Stochastic Volatility Calibration',
       authors: 'Angus Ng',
@@ -120,9 +144,9 @@ export default function PublicationsPage() {
           <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
             <BookOpen className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-4xl font-bold">Research in Progress</h1>
+          <h1 className="text-4xl font-bold">Publications</h1>
           <p className="text-xl text-muted-foreground">
-            Current and planned academic work
+            Research papers and technical reports
           </p>
         </motion.div>
 
@@ -158,11 +182,37 @@ export default function PublicationsPage() {
           </Card>
         </motion.div>
 
-        {/* Publications List */}
+        {/* Published Papers */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
+          className="space-y-6"
+        >
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-green-400" />
+            Published Papers
+          </h2>
+          
+          <div className="space-y-4">
+            {publishedPapers.map((pub, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 * index }}
+              >
+                <Publication {...pub} />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Working Papers */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
           className="space-y-6"
         >
           <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -171,7 +221,7 @@ export default function PublicationsPage() {
           </h2>
           
           <div className="space-y-4">
-            {publications.map((pub, index) => (
+            {workingPapers.map((pub, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -193,7 +243,7 @@ export default function PublicationsPage() {
           <Card className="glass-card border-primary/20">
             <CardContent className="p-6">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">Note:</strong> The works listed above are 
+                <strong className="text-foreground">Note:</strong> The working papers listed above are 
                 in various stages of preparation and have not yet been peer-reviewed. 
                 They represent ongoing research and the conclusions may evolve as the 
                 work progresses. For collaboration inquiries or to discuss these topics, 

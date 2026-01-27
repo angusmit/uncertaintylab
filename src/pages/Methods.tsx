@@ -6,6 +6,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { 
   Database, 
   Calculator, 
@@ -15,7 +16,9 @@ import {
   Dices,
   Sliders,
   FileSearch,
-  TrendingUp
+  TrendingUp,
+  BookOpen,
+  ArrowRight
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MathBlock, MathInline } from '@/components/Math';
@@ -213,6 +216,50 @@ export default function MethodsPage() {
             <MethodSection key={index} {...method} />
           ))}
         </div>
+
+        {/* Foundational Mathematics */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card className="glass-card border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-primary" />
+                Foundational Mathematics
+              </CardTitle>
+              <CardDescription>
+                Research papers that provide the theoretical foundation for Uncertainty Lab
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link 
+                to="/publications/inverse-fourier-image-restoration"
+                className="block p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors group"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                      Image Restoration by the Inverse Fourier Transform
+                    </h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      This paper introduces Fourier-domain inversion, convolution theorems, kernel filtering, 
+                      and instability analysis that directly motivate volatility surface reconstruction and 
+                      calibration in Uncertainty Lab. It establishes the mathematical framework for understanding 
+                      inverse problems, regularisation, and the bias-variance tradeoff.
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-3">
+                      Angus Ng (2025) • Uncertainty Lab • v1.0 (Preliminary)
+                    </p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 mt-1" />
+                </div>
+              </Link>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Mathematical Notation */}
         <motion.div
