@@ -1,10 +1,13 @@
 /**
  * PageTransition - Hexagonal GRID mask transition for paper pages
  * 
- * Creates a mosaic reveal/hide effect using hundreds of hexagon tiles
+ * Creates a seamless mosaic reveal/hide effect using overlapping hexagon tiles
  * that animate in a wave pattern across the screen.
  * 
- * This is the "hex grid tile mask" transition matching Uncertainty Lab branding.
+ * - Entrance (reveal): Dark hexes shrink LEFT-TO-RIGHT, revealing white paper
+ * - Exit (hide): Dark hexes grow RIGHT-TO-LEFT, covering the paper
+ * 
+ * No gaps - hexes overlap to ensure complete coverage.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -23,10 +26,11 @@ interface PageTransitionProps {
 // Hex Grid Configuration
 // =============================================================================
 
-const HEX_SIZE = 32;
-const WAVE_SPREAD = 0.35;
-const STAGGER_NOISE = 0.06;
-const DURATION = 850;
+const HEX_SIZE = 40; // Base hex radius
+const HEX_DRAW_SIZE = 48; // Larger draw size for overlap (eliminates gaps)
+const WAVE_SPREAD = 0.5; // How spread out the wave is (0-1)
+const STAGGER_NOISE = 0.03; // Small random variation for organic feel
+const DURATION = 950; // Animation duration in ms
 
 // =============================================================================
 // Hex Math Utilities
@@ -45,7 +49,7 @@ function drawHexagon(
   size: number,
   fillStyle: string
 ) {
-  if (size < 0.5) return;
+  if (size < 1) return;
   ctx.beginPath();
   for (let i = 0; i < 6; i++) {
     const [x, y] = hexCorner(cx, cy, size, i);
@@ -57,45 +61,59 @@ function drawHexagon(
   ctx.fill();
 }
 
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function easeOutQuart(t: number): number {
+  return 1 - Math.pow(1 - t, 4);
+}
+
+function easeInQuart(t: number): number {
+  return t * t * t * t;
 }
 
 function generateHexGrid(width: number, height: number) {
   const hexes: Array<{ x: number; y: number; delay: number }> = [];
   const hexWidth = HEX_SIZE * 2;
   const hexHeight = Math.sqrt(3) * HEX_SIZE;
-  const horizDist = hexWidth * 0.75 + 2;
-  const vertDist = hexHeight + 2;
+  // Tight spacing for overlap
+  const horizDist = hexWidth * 0.72;
+  const vertDist = hexHeight * 0.88;
   
-  const cols = Math.ceil(width / horizDist) + 4;
-  const rows = Math.ceil(height / vertDist) + 4;
+  // Extra columns/rows to cover edges
+  const cols = Math.ceil(width / horizDist) + 8;
+  const rows = Math.ceil(height / vertDist) + 8;
+  
+  const startX = -HEX_SIZE * 4;
+  const startY = -HEX_SIZE * 4;
   
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      const x = -HEX_SIZE * 2 + col * horizDist;
-      const y = -HEX_SIZE * 2 + row * vertDist + (col % 2 === 1 ? vertDist / 2 : 0);
+      const x = startX + col * horizDist;
+      const y = startY + row * vertDist + (col % 2 === 1 ? vertDist / 2 : 0);
       hexes.push({ x, y, delay: 0 });
     }
   }
   return hexes;
 }
 
+// Calculate delays for horizontal wave
 function calculateDelays(
   hexes: Array<{ x: number; y: number; delay: number }>,
   width: number,
-  height: number,
-  originX: number,
-  originY: number
+  direction: 'ltr' | 'rtl'
 ) {
-  const maxDist = Math.sqrt(width * width + height * height);
+  const minX = -HEX_SIZE * 4;
+  const maxX = width + HEX_SIZE * 4;
+  const range = maxX - minX;
+  
   for (const hex of hexes) {
-    const dx = hex.x - originX;
-    const dy = hex.y - originY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    const normalizedDist = dist / maxDist;
+    const normalizedX = (hex.x - minX) / range;
+    // Small vertical wave for organic feel
+    const verticalWave = Math.sin(hex.y * 0.015) * 0.02;
     const randomOffset = (Math.random() - 0.5) * STAGGER_NOISE;
-    hex.delay = Math.max(0, Math.min(1, normalizedDist * WAVE_SPREAD + randomOffset));
+    
+    // LTR: left hexes animate first; RTL: right hexes animate first
+    const baseDelay = direction === 'ltr' ? normalizedX : (1 - normalizedX);
+    
+    hex.delay = Math.max(0, Math.min(0.95, baseDelay * WAVE_SPREAD + verticalWave + randomOffset));
   }
 }
 
@@ -108,9 +126,8 @@ interface HexGridCanvasProps {
   direction: 'reveal' | 'hide';
   onComplete?: () => void;
   onPartialReveal?: () => void;
-  originX?: number;
-  originY?: number;
   darkColor: string;
+  lightColor: string;
 }
 
 function HexGridCanvas({
@@ -118,9 +135,8 @@ function HexGridCanvas({
   direction,
   onComplete,
   onPartialReveal,
-  originX = 0.5,
-  originY = 0.5,
   darkColor,
+  lightColor,
 }: HexGridCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
@@ -151,8 +167,12 @@ function HexGridCanvas({
     if (!ctx) return;
     ctx.scale(dpr, dpr);
     
+    // Generate hex grid
     hexesRef.current = generateHexGrid(width, height);
-    calculateDelays(hexesRef.current, width, height, originX * width, originY * height);
+    
+    // Wave direction: LTR for reveal (entrance), RTL for hide (exit)
+    const waveDirection = direction === 'reveal' ? 'ltr' : 'rtl';
+    calculateDelays(hexesRef.current, width, waveDirection);
     
     startTime.current = null;
     partialFired.current = false;
@@ -171,26 +191,47 @@ function HexGridCanvas({
       const elapsed = timestamp - startTime.current;
       const progress = Math.min(1, elapsed / DURATION);
       
+      // Clear canvas
       ctx.clearRect(0, 0, width, height);
       
-      for (const hex of hexesRef.current) {
-        const hexProgress = Math.max(0, Math.min(1, (progress - hex.delay) / (1 - WAVE_SPREAD)));
-        const easedProgress = easeInOutCubic(hexProgress);
+      if (direction === 'reveal') {
+        // REVEAL: Start dark, hexes shrink left-to-right to show white
+        // First fill with white (the revealed content)
+        ctx.fillStyle = lightColor;
+        ctx.fillRect(0, 0, width, height);
         
-        if (direction === 'reveal') {
-          if (easedProgress < 1) {
-            const scale = 1 - easedProgress;
-            drawHexagon(ctx, hex.x, hex.y, HEX_SIZE * scale, darkColor);
+        // Draw dark hexes that shrink (revealing white underneath)
+        for (const hex of hexesRef.current) {
+          const hexProgress = Math.max(0, Math.min(1, (progress - hex.delay) / (1 - WAVE_SPREAD)));
+          const easedProgress = easeOutQuart(hexProgress);
+          
+          // Hex shrinks from full size to 0
+          const scale = 1 - easedProgress;
+          if (scale > 0.01) {
+            drawHexagon(ctx, hex.x, hex.y, HEX_DRAW_SIZE * scale, darkColor);
           }
-        } else {
-          if (easedProgress > 0) {
-            const scale = easedProgress;
-            drawHexagon(ctx, hex.x, hex.y, HEX_SIZE * scale, darkColor);
+        }
+      } else {
+        // HIDE: Start white, dark hexes grow right-to-left to cover
+        // First fill with white (the current content)
+        ctx.fillStyle = lightColor;
+        ctx.fillRect(0, 0, width, height);
+        
+        // Draw dark hexes that grow (covering white)
+        for (const hex of hexesRef.current) {
+          const hexProgress = Math.max(0, Math.min(1, (progress - hex.delay) / (1 - WAVE_SPREAD)));
+          const easedProgress = easeInQuart(hexProgress);
+          
+          // Hex grows from 0 to full size
+          const scale = easedProgress;
+          if (scale > 0.01) {
+            drawHexagon(ctx, hex.x, hex.y, HEX_DRAW_SIZE * scale, darkColor);
           }
         }
       }
       
-      if (!partialFired.current && progress >= 0.55 && direction === 'reveal') {
+      // Fire partial reveal callback at ~50% for content animation
+      if (!partialFired.current && progress >= 0.45 && direction === 'reveal') {
         partialFired.current = true;
         onPartialReveal?.();
       }
@@ -202,23 +243,33 @@ function HexGridCanvas({
       }
     };
     
-    // Draw initial frame
+    // Draw initial frame immediately
     ctx.clearRect(0, 0, width, height);
+    
     if (direction === 'reveal') {
-      // Start with full coverage
+      // Initial state: fully dark (all hexes at full size covering white)
+      ctx.fillStyle = lightColor;
+      ctx.fillRect(0, 0, width, height);
       for (const hex of hexesRef.current) {
-        drawHexagon(ctx, hex.x, hex.y, HEX_SIZE, darkColor);
+        drawHexagon(ctx, hex.x, hex.y, HEX_DRAW_SIZE, darkColor);
       }
+    } else {
+      // Initial state: fully white (no dark hexes yet)
+      ctx.fillStyle = lightColor;
+      ctx.fillRect(0, 0, width, height);
     }
     
-    animationRef.current = requestAnimationFrame(animate);
+    // Small delay before starting animation for smoother perception
+    setTimeout(() => {
+      animationRef.current = requestAnimationFrame(animate);
+    }, 16);
     
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isActive, direction, originX, originY, darkColor, onComplete, onPartialReveal, prefersReducedMotion]);
+  }, [isActive, direction, darkColor, lightColor, onComplete, onPartialReveal, prefersReducedMotion]);
 
   if (!isActive) return null;
 
@@ -251,7 +302,6 @@ export function PageTransition({
   const [phase, setPhase] = useState<'entering' | 'visible' | 'exiting'>('entering');
   const [showContent, setShowContent] = useState(false);
   const [showCanvas, setShowCanvas] = useState(true);
-  const [exitOrigin, setExitOrigin] = useState({ x: 0.5, y: 0.5 });
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -280,18 +330,10 @@ export function PageTransition({
   }, [navigate]);
 
   // Intercept navigation for exit animation
-  const handleExit = useCallback((targetPath: string, clickX?: number, clickY?: number) => {
+  const handleExit = useCallback((targetPath: string) => {
     if (phase === 'exiting') return;
     
     (window as any).__exitTarget = targetPath;
-    
-    if (clickX !== undefined && clickY !== undefined) {
-      setExitOrigin({
-        x: clickX / window.innerWidth,
-        y: clickY / window.innerHeight,
-      });
-    }
-    
     setPhase('exiting');
     setShowCanvas(true);
     setShowContent(false);
@@ -307,7 +349,7 @@ export function PageTransition({
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh' }}>
-      {/* Base dark background */}
+      {/* Base dark background (for when canvas is not showing) */}
       <div 
         style={{
           position: 'fixed',
@@ -334,9 +376,8 @@ export function PageTransition({
           direction="reveal"
           onPartialReveal={handlePartialReveal}
           onComplete={handleEnterComplete}
-          originX={0.5}
-          originY={0.3}
           darkColor={baseBg}
+          lightColor={revealBg}
         />
       )}
       
@@ -345,9 +386,8 @@ export function PageTransition({
           isActive={showCanvas}
           direction="hide"
           onComplete={handleExitComplete}
-          originX={exitOrigin.x}
-          originY={exitOrigin.y}
           darkColor={baseBg}
+          lightColor={revealBg}
         />
       )}
 
@@ -356,11 +396,11 @@ export function PageTransition({
         {showContent && (
           <motion.div
             key="content"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ 
-              duration: 0.4,
+              duration: 0.35,
               ease: 'easeOut',
             }}
             style={{
@@ -378,7 +418,7 @@ export function PageTransition({
 }
 
 /**
- * Custom back link that triggers exit animation with click position
+ * Custom back link that triggers exit animation
  */
 export function TransitionBackLink({ 
   to, 
@@ -393,7 +433,7 @@ export function TransitionBackLink({
     e.preventDefault();
     const exitFn = (window as any).__paperPageExit;
     if (exitFn) {
-      exitFn(to, e.clientX, e.clientY);
+      exitFn(to);
     }
   };
 
