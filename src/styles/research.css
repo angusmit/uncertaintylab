@@ -280,35 +280,46 @@
    MATH (KaTeX)
    ============================================================================= */
 
-.research-content .katex {
+.research-content .katex,
+.research-theme .katex {
   font-size: calc(var(--research-font-size) * var(--research-math-scale));
   color: var(--research-text);
 }
 
-.research-content .katex-display {
-  margin: 1.5rem 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0.5rem 0;
+.research-content .katex-display,
+.research-theme .katex-display {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
 }
 
-/* Math block container */
+/* Custom wrapper for display math */
+.katex-display-wrapper {
+  text-align: center;
+  padding: 0.25rem 0;
+}
+
+.katex-display-wrapper > .katex-display {
+  margin: 0;
+  padding: 0;
+}
+
+/* Math block container - transparent, centered */
 .research-math-block {
   margin: 1.75rem 0;
-  padding: 1.25rem 1.5rem;
-  background-color: var(--research-theorem-bg);
-  border-radius: 0.5rem;
-  overflow-x: auto;
+  padding: 0.75rem 0;
+  background-color: transparent;
+  text-align: center;
 }
 
-/* Boxed/important equations */
+/* Boxed/important equations - light green with cyan border */
 .research-math-boxed {
   margin: 1.75rem 0;
   padding: 1.25rem 1.5rem;
   background-color: #ECFDF5;
   border: 1px solid var(--research-cyan-dark);
   border-radius: 0.5rem;
-  overflow-x: auto;
+  text-align: center;
 }
 
 .research-math-boxed .equation-label {
@@ -316,7 +327,33 @@
   font-size: 0.8rem;
   color: var(--research-text-muted);
   text-align: right;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+/* Override any MathBlock component styling that might leak in */
+.research-theme .my-6.py-4.px-6.rounded-lg.bg-muted\/30,
+.research-content .my-6.py-4.px-6.rounded-lg.bg-muted\/30 {
+  background-color: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Math inside theorem boxes - inherit background */
+.research-theorem-box .research-math-block {
+  background-color: transparent;
+  margin: 1rem 0;
+  padding: 0.5rem 0;
+}
+
+.research-theorem-box .research-math-boxed {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Ensure KaTeX doesn't add its own backgrounds */
+.research-theme .katex-html,
+.research-content .katex-html {
+  background: transparent !important;
 }
 
 /* =============================================================================

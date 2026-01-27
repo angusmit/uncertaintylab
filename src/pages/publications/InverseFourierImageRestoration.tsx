@@ -11,8 +11,10 @@
 
 import { Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Tag, Quote, Copy, Check } from 'lucide-react';
-import { MathBlock, MathInline } from '@/components/Math';
-import { useState, useEffect } from 'react';
+import { MathInline } from '@/components/Math';
+import { useState, useEffect, useRef } from 'react';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
 import '@/styles/research.css';
 
 // =============================================================================
@@ -70,21 +72,61 @@ function ProofStep({ step, children }: { step: string; children: React.ReactNode
 }
 
 // =============================================================================
-// Math Components with Research Styling
+// Math Components with Research Styling (no gray background)
 // =============================================================================
 
-function MathDisplay({ children, label }: { children: string; label?: string }) {
+function MathDisplay({ children }: { children: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (ref.current) {
+      try {
+        katex.render(children, ref.current, {
+          displayMode: true,
+          throwOnError: false,
+          trust: true,
+          strict: false,
+        });
+      } catch (error) {
+        console.error('KaTeX error:', error);
+        if (ref.current) {
+          ref.current.textContent = children;
+        }
+      }
+    }
+  }, [children]);
+
   return (
     <div className="research-math-block">
-      <MathBlock>{children}</MathBlock>
+      <div ref={ref} className="katex-display-wrapper" />
     </div>
   );
 }
 
 function MathBoxed({ children, label }: { children: string; label?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    if (ref.current) {
+      try {
+        katex.render(children, ref.current, {
+          displayMode: true,
+          throwOnError: false,
+          trust: true,
+          strict: false,
+        });
+      } catch (error) {
+        console.error('KaTeX error:', error);
+        if (ref.current) {
+          ref.current.textContent = children;
+        }
+      }
+    }
+  }, [children]);
+
   return (
     <div className="research-math-boxed">
-      <MathBlock>{children}</MathBlock>
+      <div ref={ref} className="katex-display-wrapper" />
       {label && <p className="equation-label">({label})</p>}
     </div>
   );
