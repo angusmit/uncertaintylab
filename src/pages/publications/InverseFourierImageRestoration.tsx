@@ -9,13 +9,13 @@
  * Uses professional academic typography (research.css)
  */
 
-import { Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Tag, Quote, Copy, Check, ChevronRight } from 'lucide-react';
 import { MathInline } from '@/components/Math';
 import { useState, useEffect, useRef } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import '@/styles/research.css';
+import { PageTransition, TransitionBackLink } from '@/components/PageTransition';
 
 // =============================================================================
 // Theorem Environment Component
@@ -211,53 +211,54 @@ export default function InverseFourierImageRestoration() {
   const tags = ['Fourier Transform', 'Inverse Problems', 'Signal Processing', 'Kernel Methods', 'Foundations'];
 
   return (
-    <div className="research-theme">
-      <div className="research-content">
-        {/* Back Link */}
-        <Link to="/publications" className="research-back-link">
-          <ArrowLeft size={16} />
-          Back to Publications
-        </Link>
+    <PageTransition revealBg="#ffffff" baseBg="#0B0E14">
+      <div className="research-theme">
+        <div className="research-content">
+          {/* Back Link */}
+          <TransitionBackLink to="/publications" className="research-back-link">
+            <ArrowLeft size={16} />
+            Back to Publications
+          </TransitionBackLink>
 
-        {/* Context Note */}
-        <div className="research-context-note">
-          <p>
-            <strong>Note:</strong> This paper serves as a mathematical and computational foundation 
-            for later work in Uncertainty Lab, including volatility surface estimation, kernel 
-            smoothing, and inverse problems in mathematical finance.
-          </p>
-        </div>
-
-        {/* Paper Header */}
-        <header className="research-paper-header">
-          <h1>Image Restoration by the Inverse Fourier Transform</h1>
-          <p className="author">Angus Ng</p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-            <span className="research-badge research-badge-published">Published (Preliminary)</span>
-            <span className="research-badge research-badge-version">v1.0</span>
+          {/* Context Note */}
+          <div className="research-context-note">
+            <p>
+              <strong>Note:</strong> This paper serves as a mathematical and computational foundation 
+              for later work in Uncertainty Lab, including volatility surface estimation, kernel 
+              smoothing, and inverse problems in mathematical finance.
+            </p>
           </div>
-          <p className="meta">2025 • Uncertainty Lab</p>
-        </header>
 
-        {/* Tags */}
-        <div className="research-tags">
-          {tags.map((tag) => (
-            <span key={tag} className="research-tag">
-              <Tag size={12} />{tag}
-            </span>
-          ))}
-        </div>
+          {/* Paper Header */}
+          <header className="research-paper-header">
+            <h1>Image Restoration by the Inverse Fourier Transform</h1>
+            <p className="author">Angus Ng</p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+              <span className="research-badge research-badge-published">Published (Preliminary)</span>
+              <span className="research-badge research-badge-version">v1.0</span>
+            </div>
+            <p className="meta">2025 • Uncertainty Lab</p>
+          </header>
 
-        {/* Abstract */}
-        <div className="research-abstract">
-          <h2><BookOpen size={18} /> Abstract</h2>
-          <p>
-            This report presents the mathematical foundations of image restoration using the Fourier 
-            Transform and its inverse. We introduce the linear shift-invariant degradation model, 
-            derive the two-dimensional convolution theorem, and explain how inverse filtering in the 
-            frequency domain can recover a degraded image. The Discrete Fourier Transform (DFT) and 
-            its efficient computation via the Fast Fourier Transform (FFT) algorithm are discussed, 
-            along with practical filtering techniques including low-pass and high-pass filters. We 
+          {/* Tags */}
+          <div className="research-tags">
+            {tags.map((tag) => (
+              <span key={tag} className="research-tag">
+                <Tag size={12} />{tag}
+              </span>
+            ))}
+          </div>
+
+          {/* Abstract */}
+          <div className="research-abstract">
+            <h2><BookOpen size={18} /> Abstract</h2>
+            <p>
+              This report presents the mathematical foundations of image restoration using the Fourier 
+              Transform and its inverse. We introduce the linear shift-invariant degradation model, 
+              derive the two-dimensional convolution theorem, and explain how inverse filtering in the 
+              frequency domain can recover a degraded image. The Discrete Fourier Transform (DFT) and 
+              its efficient computation via the Fast Fourier Transform (FFT) algorithm are discussed, 
+              along with practical filtering techniques including low-pass and high-pass filters. We 
             analyse the limitations of naive inverse filtering, particularly its instability in the 
             presence of noise when the system transfer function has small magnitude, and discuss the 
             inherent limitations of Fourier-based methods for image processing.
@@ -756,5 +757,6 @@ smoothed = apply_frequency_filter(img, lp_mask)`}</CodeBlock>
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

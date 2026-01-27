@@ -5,7 +5,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { BookOpen, FileText, Clock, ArrowRight, GraduationCap, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,8 @@ interface PublicationProps {
 }
 
 function Publication({ title, authors, status, abstract, year, link, tags }: PublicationProps) {
+  const navigate = useNavigate();
+  
   const statusConfig = {
     'in-preparation': { label: 'In Preparation', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' },
     'submitted': { label: 'Submitted', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
@@ -31,6 +33,12 @@ function Publication({ title, authors, status, abstract, year, link, tags }: Pub
 
   const { label, color } = statusConfig[status];
   const isPublished = status === 'published';
+
+  const handleClick = () => {
+    if (isPublished && link) {
+      navigate(link);
+    }
+  };
 
   const content = (
     <Card className={`glass-card transition-all ${isPublished ? 'hover:border-primary/40 cursor-pointer' : ''}`}>
@@ -74,7 +82,7 @@ function Publication({ title, authors, status, abstract, year, link, tags }: Pub
   );
 
   if (isPublished && link) {
-    return <Link to={link}>{content}</Link>;
+    return <div onClick={handleClick} style={{ cursor: 'pointer' }}>{content}</div>;
   }
 
   return content;
