@@ -243,27 +243,97 @@
 }
 
 /* =============================================================================
-   PROOF ENVIRONMENT
+   PROOF ENVIRONMENT (Collapsible)
    ============================================================================= */
 
+.research-proof-container {
+  margin: 1.5rem 0;
+}
+
+.research-proof-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--research-theorem-bg);
+  border: 1px solid #E5E7EB;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-family: var(--research-font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--research-navy);
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.research-proof-toggle:hover {
+  background-color: #E5E7EB;
+  border-color: var(--research-navy);
+}
+
+.research-proof-toggle svg {
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.research-proof-toggle.expanded svg {
+  transform: rotate(90deg);
+}
+
+.research-proof-toggle .proof-label {
+  font-style: italic;
+}
+
+.research-proof-toggle .proof-hint {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--research-text-muted);
+  font-weight: 400;
+}
+
+.research-proof-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.research-proof-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.research-proof-content.expanded {
+  max-height: none;
+  opacity: 1;
+}
+
 .research-proof {
-  margin: 2rem 0;
+  margin: 0;
+  padding: 1.5rem;
   padding-left: 1.5rem;
   border-left: 2px solid var(--research-proof-border);
+  border-top: none;
+  background-color: #FAFAFA;
+  border-radius: 0 0 0.5rem 0.5rem;
 }
 
 .research-proof .proof-title {
-  font-family: var(--research-font-sans);
-  font-weight: 600;
-  font-style: italic;
+  display: none; /* Hidden since we have the toggle button */
+}
+
+.research-proof .proof-content {
+  font-size: 0.95rem;
+}
+
+.research-proof .proof-content p {
   margin-bottom: 1rem;
-  color: var(--research-navy);
 }
 
 .research-proof .proof-qed {
   text-align: right;
   font-size: 1.25rem;
-  margin-top: 0.75rem;
+  margin-top: 1rem;
   color: var(--research-navy);
 }
 
@@ -296,30 +366,67 @@
 /* Custom wrapper for display math */
 .katex-display-wrapper {
   text-align: center;
-  padding: 0.25rem 0;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
 }
 
 .katex-display-wrapper > .katex-display {
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Force KaTeX to not add extra margins */
+.research-theme .katex-display,
+.research-content .katex-display,
+.katex-display-wrapper .katex-display {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.research-theme .katex-display > .katex,
+.research-content .katex-display > .katex,
+.katex-display-wrapper .katex-display > .katex {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* Math block container - transparent, centered */
 .research-math-block {
-  margin: 1.75rem 0;
-  padding: 0.75rem 0;
+  margin: 1.25rem 0;
+  padding: 0.5rem 0;
   background-color: transparent;
   text-align: center;
 }
 
-/* Boxed/important equations - light green with cyan border */
+/* More compact math in proofs */
+.research-proof .research-math-block {
+  margin: 0.75rem 0;
+  padding: 0.25rem 0;
+}
+
+/* Boxed/important equations - light green with cyan border, compact */
 .research-math-boxed {
-  margin: 1.75rem 0;
-  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  padding: 0.75rem 1.25rem;
   background-color: #ECFDF5;
   border: 1px solid var(--research-cyan-dark);
   border-radius: 0.5rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.research-math-boxed .katex-display-wrapper {
+  padding: 0;
+  margin: 0;
+}
+
+.research-math-boxed .katex-display {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .research-math-boxed .equation-label {
@@ -327,7 +434,8 @@
   font-size: 0.8rem;
   color: var(--research-text-muted);
   text-align: right;
-  margin-top: 0.75rem;
+  margin-top: 0.25rem;
+  align-self: flex-end;
 }
 
 /* Override any MathBlock component styling that might leak in */

@@ -10,7 +10,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Tag, Quote, Copy, Check } from 'lucide-react';
+import { ArrowLeft, BookOpen, Tag, Quote, Copy, Check, ChevronRight } from 'lucide-react';
 import { MathInline } from '@/components/Math';
 import { useState, useEffect, useRef } from 'react';
 import katex from 'katex';
@@ -49,15 +49,31 @@ function TheoremBox({ type, number, title, children }: TheoremBoxProps) {
 }
 
 // =============================================================================
-// Proof Environment
+// Proof Environment (Collapsible)
 // =============================================================================
 
-function Proof({ children }: { children: React.ReactNode }) {
+function Proof({ children, title = "Proof" }: { children: React.ReactNode; title?: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
   return (
-    <div className="research-proof">
-      <p className="proof-title">Proof.</p>
-      <div className="proof-content">{children}</div>
-      <p className="proof-qed">∎</p>
+    <div className="research-proof-container">
+      <button 
+        className={`research-proof-toggle ${isExpanded ? 'expanded' : ''}`}
+        onClick={() => setIsExpanded(!isExpanded)}
+        aria-expanded={isExpanded}
+      >
+        <ChevronRight size={18} />
+        <span className="proof-label">{title}</span>
+        <span className="proof-hint">{isExpanded ? 'Click to collapse' : 'Click to expand'}</span>
+      </button>
+      <div className={`research-proof-content ${isExpanded ? 'expanded' : 'collapsed'}`}>
+        {isExpanded && (
+          <div className="research-proof">
+            <div className="proof-content">{children}</div>
+            <p className="proof-qed">∎</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -383,7 +399,7 @@ export default function InverseFourierImageRestoration() {
               <p>where <MathInline>{`G(u,v) = \\mathcal{F}\\{g\\}(u,v)`}</MathInline>.</p>
             </TheoremBox>
 
-            <Proof>
+            <Proof title="Proof of Theorem 3.4 (Convolution Theorem)">
               <p>
                 By Lemma 3.3, the convolution <MathInline>{`g = f * h`}</MathInline> exists and <MathInline>{`g \\in L^1(\\mathbb{R}^2)`}</MathInline>, 
                 so the Fourier Transform of <MathInline>{`g`}</MathInline> is well-defined. We compute <MathInline>{`G(u,v) = \\mathcal{F}\\{g\\}(u,v)`}</MathInline>.
