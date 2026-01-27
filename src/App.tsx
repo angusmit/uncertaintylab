@@ -98,9 +98,7 @@ const App = () => (
               </AppLayout>
             } />
             <Route path="/publications/inverse-fourier-image-restoration" element={
-              <AppLayout>
-                <InverseFourierImageRestoration />
-              </AppLayout>
+              <InverseFourierImageRestoration />
             } />
             <Route path="/explore" element={
               <AppLayout>

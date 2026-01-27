@@ -1,0 +1,710 @@
+/**
+ * Research Page Styles
+ * 
+ * Professional academic typography for publications and methods pages.
+ * This creates a light-themed reading experience while the main app
+ * remains dark-themed.
+ */
+
+/* =============================================================================
+   FONT IMPORTS
+   ============================================================================= */
+
+/* Serif body font - Libre Baskerville (similar to Charter/Palatino) */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* Sans-serif headings - Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Monospace code - JetBrains Mono */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* =============================================================================
+   CSS CUSTOM PROPERTIES (Research Theme)
+   ============================================================================= */
+
+.research-theme {
+  /* Colors */
+  --research-bg: #ffffff;
+  --research-text: #1A1A1B;
+  --research-text-muted: #4B5563;
+  --research-navy: #0B0E14;
+  --research-cyan: #5EEAD4;
+  --research-cyan-dark: #14B8A6;
+  --research-theorem-bg: #F1F5F9;
+  --research-theorem-border: #0B0E14;
+  --research-critical-bg: #FEF2F2;
+  --research-critical-border: #FECACA;
+  --research-critical-text: #991B1B;
+  --research-definition-bg: #EFF6FF;
+  --research-definition-border: #3B82F6;
+  --research-lemma-bg: #FFFBEB;
+  --research-lemma-border: #F59E0B;
+  --research-remark-bg: #F5F3FF;
+  --research-remark-border: #8B5CF6;
+  --research-proof-border: #D1D5DB;
+  --research-code-bg: #0B0E14;
+  --research-link: #0B0E14;
+  --research-link-hover: #14B8A6;
+
+  /* Typography */
+  --research-font-serif: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+  --research-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --research-font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  
+  /* Sizing */
+  --research-max-width: 780px;
+  --research-line-height: 1.7;
+  --research-font-size: 17px;
+  --research-math-scale: 1.1;
+}
+
+/* =============================================================================
+   BASE STYLES
+   ============================================================================= */
+
+.research-theme {
+  background-color: var(--research-bg) !important;
+  color: var(--research-text) !important;
+  min-height: 100vh;
+}
+
+.research-content {
+  font-family: var(--research-font-serif);
+  font-size: var(--research-font-size);
+  line-height: var(--research-line-height);
+  color: var(--research-text);
+  max-width: var(--research-max-width);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* =============================================================================
+   HEADINGS
+   ============================================================================= */
+
+.research-content h1,
+.research-content h2,
+.research-content h3,
+.research-content h4 {
+  font-family: var(--research-font-sans);
+  font-weight: 600;
+  color: var(--research-navy);
+  line-height: 1.3;
+}
+
+.research-content h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.research-content h2 {
+  font-size: 1.5rem;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--research-navy);
+}
+
+.research-content h3 {
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.research-content h4 {
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* =============================================================================
+   PARAGRAPHS & TEXT
+   ============================================================================= */
+
+.research-content p {
+  margin-bottom: 1.25rem;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.research-content strong {
+  font-weight: 700;
+  color: var(--research-navy);
+}
+
+.research-content em {
+  font-style: italic;
+}
+
+.research-content a {
+  color: var(--research-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease;
+}
+
+.research-content a:hover {
+  color: var(--research-link-hover);
+}
+
+/* Muted text */
+.research-content .text-muted,
+.research-content .text-muted-foreground {
+  color: var(--research-text-muted) !important;
+}
+
+/* =============================================================================
+   LISTS
+   ============================================================================= */
+
+.research-content ul,
+.research-content ol {
+  margin: 1.25rem 0;
+  padding-left: 1.5rem;
+}
+
+.research-content li {
+  margin-bottom: 0.5rem;
+}
+
+.research-content li::marker {
+  color: var(--research-navy);
+}
+
+/* =============================================================================
+   THEOREM ENVIRONMENTS
+   ============================================================================= */
+
+/* Base theorem box */
+.research-theorem-box {
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid;
+}
+
+/* Definition - Blue */
+.research-definition {
+  background-color: var(--research-definition-bg);
+  border-left-color: var(--research-definition-border);
+}
+
+/* Theorem - Navy */
+.research-theorem {
+  background-color: var(--research-theorem-bg);
+  border-left-color: var(--research-theorem-border);
+}
+
+/* Lemma - Amber */
+.research-lemma {
+  background-color: var(--research-lemma-bg);
+  border-left-color: var(--research-lemma-border);
+}
+
+/* Remark - Purple */
+.research-remark {
+  background-color: var(--research-remark-bg);
+  border-left-color: var(--research-remark-border);
+}
+
+/* Critical Remark - Rose/Red */
+.research-critical {
+  background-color: var(--research-critical-bg);
+  border-left-color: var(--research-critical-text);
+}
+
+.research-critical .theorem-title,
+.research-critical strong {
+  color: var(--research-critical-text) !important;
+}
+
+/* Theorem title */
+.research-theorem-box .theorem-title {
+  font-family: var(--research-font-sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  color: var(--research-navy);
+}
+
+.research-theorem-box .theorem-content {
+  font-size: 0.98rem;
+  color: var(--research-text);
+}
+
+.research-theorem-box .theorem-content p {
+  margin-bottom: 0.75rem;
+}
+
+.research-theorem-box .theorem-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* =============================================================================
+   PROOF ENVIRONMENT
+   ============================================================================= */
+
+.research-proof {
+  margin: 2rem 0;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--research-proof-border);
+}
+
+.research-proof .proof-title {
+  font-family: var(--research-font-sans);
+  font-weight: 600;
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: var(--research-navy);
+}
+
+.research-proof .proof-qed {
+  text-align: right;
+  font-size: 1.25rem;
+  margin-top: 0.75rem;
+  color: var(--research-navy);
+}
+
+.research-proof .proof-step {
+  font-family: var(--research-font-sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--research-navy);
+}
+
+/* =============================================================================
+   MATH (KaTeX)
+   ============================================================================= */
+
+.research-content .katex {
+  font-size: calc(var(--research-font-size) * var(--research-math-scale));
+  color: var(--research-text);
+}
+
+.research-content .katex-display {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}
+
+/* Math block container */
+.research-math-block {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--research-theorem-bg);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+/* Boxed/important equations */
+.research-math-boxed {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1.5rem;
+  background-color: #ECFDF5;
+  border: 1px solid var(--research-cyan-dark);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.research-math-boxed .equation-label {
+  font-family: var(--research-font-sans);
+  font-size: 0.8rem;
+  color: var(--research-text-muted);
+  text-align: right;
+  margin-top: 0.5rem;
+}
+
+/* =============================================================================
+   CODE BLOCKS
+   ============================================================================= */
+
+.research-code-block {
+  margin: 2rem 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.research-code-header {
+  background-color: #1E293B;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #334155;
+}
+
+.research-code-header .code-caption {
+  font-family: var(--research-font-sans);
+  font-size: 0.85rem;
+  color: #94A3B8;
+}
+
+.research-code-header .code-caption span {
+  font-weight: 600;
+  color: var(--research-cyan);
+}
+
+.research-code-header button {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.research-code-header button:hover {
+  color: var(--research-cyan);
+}
+
+.research-code-content {
+  background-color: var(--research-code-bg);
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+}
+
+.research-code-content pre {
+  margin: 0;
+  font-family: var(--research-font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.research-code-content code {
+  font-family: var(--research-font-mono);
+  color: #E2E8F0;
+}
+
+/* Syntax highlighting (Python-like) */
+.research-code-content .keyword {
+  color: var(--research-cyan);
+}
+
+.research-code-content .string {
+  color: #FCD34D;
+}
+
+.research-code-content .comment {
+  color: #6B7280;
+  font-style: italic;
+}
+
+.research-code-content .function {
+  color: #A78BFA;
+}
+
+.research-code-content .number {
+  color: #FB923C;
+}
+
+/* Inline code */
+.research-content code:not(pre code) {
+  font-family: var(--research-font-mono);
+  font-size: 0.9em;
+  background-color: var(--research-theorem-bg);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  color: var(--research-navy);
+}
+
+/* =============================================================================
+   PAPER HEADER
+   ============================================================================= */
+
+.research-paper-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.research-paper-header h1 {
+  font-family: var(--research-font-sans);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--research-navy);
+  line-height: 1.3;
+  margin-bottom: 1rem;
+}
+
+.research-paper-header .author {
+  font-family: var(--research-font-serif);
+  font-size: 1.1rem;
+  color: var(--research-text-muted);
+  margin-bottom: 1rem;
+}
+
+.research-paper-header .meta {
+  font-family: var(--research-font-sans);
+  font-size: 0.85rem;
+  color: var(--research-text-muted);
+}
+
+/* =============================================================================
+   CONTEXT NOTE
+   ============================================================================= */
+
+.research-context-note {
+  background: linear-gradient(135deg, #0B0E14 0%, #1E293B 100%);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.research-context-note p {
+  font-family: var(--research-font-sans);
+  font-size: 0.9rem;
+  color: #E2E8F0;
+  margin: 0;
+  text-align: left;
+}
+
+.research-context-note strong {
+  color: var(--research-cyan);
+}
+
+/* =============================================================================
+   ABSTRACT
+   ============================================================================= */
+
+.research-abstract {
+  background-color: var(--research-theorem-bg);
+  border-radius: 0.75rem;
+  padding: 1.5rem 2rem;
+  margin-bottom: 3rem;
+}
+
+.research-abstract h2 {
+  font-family: var(--research-font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--research-navy);
+  margin: 0 0 1rem 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.research-abstract p {
+  font-size: 0.95rem;
+  margin: 0;
+  color: var(--research-text);
+}
+
+/* =============================================================================
+   TAGS / BADGES
+   ============================================================================= */
+
+.research-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.research-tag {
+  font-family: var(--research-font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  background-color: var(--research-theorem-bg);
+  color: var(--research-text-muted);
+  border: 1px solid #E5E7EB;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.research-badge {
+  font-family: var(--research-font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.research-badge-published {
+  background-color: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+.research-badge-version {
+  background-color: var(--research-theorem-bg);
+  color: var(--research-text-muted);
+  border: 1px solid #E5E7EB;
+}
+
+/* =============================================================================
+   CITATION BLOCK
+   ============================================================================= */
+
+.research-citation {
+  margin-top: 4rem;
+  padding: 1.5rem 2rem;
+  background-color: var(--research-theorem-bg);
+  border-radius: 0.75rem;
+  border: 1px solid #E5E7EB;
+}
+
+.research-citation h3 {
+  font-family: var(--research-font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--research-navy);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.research-citation .citation-text {
+  font-family: var(--research-font-mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--research-text);
+  background-color: white;
+  padding: 1rem 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid #E5E7EB;
+}
+
+.research-citation .citation-text p {
+  margin: 0 0 0.25rem 0;
+  text-align: left;
+}
+
+.research-citation .citation-text .url {
+  font-size: 0.8rem;
+  color: var(--research-text-muted);
+  word-break: break-all;
+}
+
+/* =============================================================================
+   REFERENCES
+   ============================================================================= */
+
+.research-references ol {
+  padding-left: 1.5rem;
+}
+
+.research-references li {
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  color: var(--research-text);
+}
+
+.research-references li em {
+  color: var(--research-text-muted);
+}
+
+.research-references a {
+  color: var(--research-link);
+  word-break: break-all;
+}
+
+/* =============================================================================
+   BACK LINK
+   ============================================================================= */
+
+.research-back-link {
+  font-family: var(--research-font-sans);
+  font-size: 0.9rem;
+  color: var(--research-text-muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  transition: color 0.2s ease;
+}
+
+.research-back-link:hover {
+  color: var(--research-navy);
+}
+
+/* =============================================================================
+   VERSION FOOTER
+   ============================================================================= */
+
+.research-version-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #E5E7EB;
+  text-align: center;
+}
+
+.research-version-footer p {
+  font-family: var(--research-font-sans);
+  font-size: 0.85rem;
+  color: var(--research-text-muted);
+  text-align: center;
+  margin: 0.5rem 0;
+}
+
+/* =============================================================================
+   RESPONSIVE
+   ============================================================================= */
+
+@media (max-width: 768px) {
+  .research-content {
+    padding: 1.5rem 1rem 3rem;
+    font-size: 16px;
+  }
+
+  .research-content h1 {
+    font-size: 1.75rem;
+  }
+
+  .research-content h2 {
+    font-size: 1.35rem;
+  }
+
+  .research-paper-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .research-theorem-box {
+    padding: 1rem 1.25rem;
+  }
+
+  .research-math-block,
+  .research-math-boxed {
+    padding: 1rem;
+  }
+
+  .research-abstract {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+/* =============================================================================
+   UTILITIES
+   ============================================================================= */
+
+.research-content .justify {
+  text-align: justify;
+}
+
+.research-content .center {
+  text-align: center;
+}
+
+.research-content .mt-0 { margin-top: 0; }
+.research-content .mb-0 { margin-bottom: 0; }
+.research-content .mt-1 { margin-top: 0.5rem; }
+.research-content .mb-1 { margin-bottom: 0.5rem; }
+.research-content .mt-2 { margin-top: 1rem; }
+.research-content .mb-2 { margin-bottom: 1rem; }
+.research-content .mt-3 { margin-top: 1.5rem; }
+.research-content .mb-3 { margin-bottom: 1.5rem; }
