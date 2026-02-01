@@ -243,6 +243,35 @@
 }
 
 /* =============================================================================
+   BLOCKQUOTE (for research emphasis quotes)
+   ============================================================================= */
+
+.research-content .research-blockquote,
+.research-content blockquote.research-blockquote {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1.5rem;
+  border-left: 4px solid var(--research-cyan);
+  background: linear-gradient(135deg, rgba(94, 234, 212, 0.06) 0%, rgba(11, 14, 20, 0.04) 100%);
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-family: var(--research-font-serif);
+  font-size: 1.02rem;
+  line-height: 1.8;
+  color: var(--research-navy);
+}
+
+.research-content .research-blockquote p {
+  margin-bottom: 0.5rem;
+}
+
+.research-content .research-blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.research-content .research-blockquote em {
+  font-style: italic;
+}
+
+/* =============================================================================
    PROOF ENVIRONMENT (Collapsible)
    ============================================================================= */
 
@@ -831,6 +860,20 @@
   .research-abstract {
     padding: 1.25rem 1.5rem;
   }
+}
+
+/* =============================================================================
+   PAGE TRANSITIONS
+   ============================================================================= */
+
+.page-transition-container {
+  isolation: isolate;
+}
+
+/* Ensure content sits above the transition layers */
+.research-theme {
+  position: relative;
+  z-index: 2;
 }
 
 /* =============================================================================

@@ -92,6 +92,15 @@ export default function PublicationsPage() {
   // Published papers
   const publishedPapers: PublicationProps[] = [
     {
+      title: 'Statistical Inference on Path Space via Rough Paths and Kernel Methods',
+      authors: 'Angus Ng',
+      status: 'published',
+      year: 2026,
+      link: '/publications/statistical-inference-path-space',
+      tags: ['Rough Paths', 'Signatures', 'Kernel Methods', 'RKHS', 'MMD', 'Two-Sample Testing'],
+      abstract: 'This report develops a mathematically rigorous framework for performing nonparametric statistical inference on distributions of stochastic processes. We introduce the signature transform from rough path theory as a universal geometric representation of sequential data, and combine it with kernel mean embeddings to construct a Maximum Mean Discrepancy statistic on path space.',
+    },
+    {
       title: 'Image Restoration by the Inverse Fourier Transform',
       authors: 'Angus Ng',
       status: 'published',

@@ -16,6 +16,7 @@ import MethodsPage from "./pages/Methods";
 import PublicationsPage from "./pages/Publications";
 import ExplorePage from "./pages/Explore";
 import InverseFourierImageRestoration from "./pages/publications/InverseFourierImageRestoration";
+import StatisticalInferencePathSpace from "./pages/publications/StatisticalInferencePathSpace";
 import { useSessionInit } from "./state/labSessionStore";
 import { API_BASE } from "./lib/api";
 
@@ -99,6 +100,9 @@ const App = () => (
             } />
             <Route path="/publications/inverse-fourier-image-restoration" element={
               <InverseFourierImageRestoration />
+            } />
+            <Route path="/publications/statistical-inference-path-space" element={
+              <StatisticalInferencePathSpace />
             } />
             <Route path="/explore" element={
               <AppLayout>
