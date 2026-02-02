@@ -1,34 +1,41 @@
+/**
+ * Insights / Recent Publications — Landing Page Section
+ * 
+ * Reads from the shared publications data source.
+ * Automatically shows the 3 most recent papers (published + working).
+ * Featured card = first published paper; secondary cards = next two.
+ */
+
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Calendar, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { publishedPapers, workingPapers, type PublicationData } from '@/data/publications';
 
-const publications = [
-  {
-    category: 'Methodology',
-    title: 'Kernel Regression for Volatility Surface Interpolation',
-    excerpt: 'A practical guide to Nadaraya-Watson estimation with bandwidth selection for implied volatility surfaces.',
-    date: 'Jan 15, 2024',
-    readTime: '8 min',
-    featured: true,
-  },
-  {
-    category: 'Numerical',
-    title: 'Newton-Raphson vs Brent for IV Inversion',
-    excerpt: 'Comparing root-finding algorithms for implied volatility computation: speed, stability, and edge cases.',
-    date: 'Jan 10, 2024',
-    readTime: '12 min',
-    featured: false,
-  },
-  {
-    category: 'Tutorial',
-    title: 'Monte Carlo Convergence Diagnostics',
-    excerpt: 'Standard errors, confidence intervals, and path-dependency in option price estimation.',
-    date: 'Jan 5, 2024',
-    readTime: '15 min',
-    featured: false,
-  },
-];
+// Take the 3 most recent papers for the landing page
+// Priority: published first, then working papers
+function getRecentPublications(): PublicationData[] {
+  const all = [...publishedPapers, ...workingPapers];
+  return all.slice(0, 3);
+}
 
 export default function Insights() {
+  const navigate = useNavigate();
+  const publications = getRecentPublications();
+
+  const handleClick = (pub: PublicationData) => {
+    if (pub.status === 'published' && pub.link) {
+      navigate(pub.link);
+    }
+  };
+
+  const handleViewAll = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate('/publications');
+  };
+
+  const featured = publications[0];
+  const secondary = publications.slice(1);
+
   return (
     <section id="insights" className="relative py-32 px-6">
       <div className="absolute inset-0 bg-gradient-to-b from-background via-card/30 to-background" />
@@ -50,7 +57,8 @@ export default function Insights() {
             </p>
           </div>
           <a
-            href="#"
+            href="/publications"
+            onClick={handleViewAll}
             className="inline-flex items-center gap-2 text-primary hover:gap-3 transition-all font-medium"
           >
             View all publications
@@ -60,45 +68,60 @@ export default function Insights() {
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Featured Article */}
-          <motion.article
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="glass-card-hover p-8 lg:row-span-2 flex flex-col justify-between group cursor-pointer"
-          >
-            <div>
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary mb-6">
-                {publications[0].category}
-              </span>
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-primary transition-colors">
-                {publications[0].title}
-              </h3>
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                {publications[0].excerpt}
-              </p>
-            </div>
-            <div className="flex items-center gap-6 mt-8 text-sm text-muted-foreground">
-              <span className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                {publications[0].date}
-              </span>
-              <span className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                {publications[0].readTime}
-              </span>
-            </div>
-          </motion.article>
+          {featured && (
+            <motion.article
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className={`glass-card-hover p-8 lg:row-span-2 flex flex-col justify-between group ${
+                featured.link ? 'cursor-pointer' : ''
+              }`}
+              onClick={() => handleClick(featured)}
+            >
+              <div>
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary mb-6">
+                  {featured.category}
+                </span>
+                <h3 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-primary transition-colors">
+                  {featured.title}
+                </h3>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  {featured.abstract}
+                </p>
+              </div>
+              <div className="flex items-center gap-6 mt-8 text-sm text-muted-foreground">
+                {featured.date && (
+                  <span className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    {featured.date}
+                  </span>
+                )}
+                {featured.readTime && (
+                  <span className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    {featured.readTime}
+                  </span>
+                )}
+                {featured.status === 'published' && featured.link && (
+                  <span className="inline-flex items-center gap-1 text-primary font-medium ml-auto">
+                    Read paper <ArrowUpRight className="w-3.5 h-3.5" />
+                  </span>
+                )}
+              </div>
+            </motion.article>
+          )}
 
           {/* Secondary Articles */}
-          {publications.slice(1).map((pub, index) => (
+          {secondary.map((pub, index) => (
             <motion.article
               key={index}
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: index * 0.1 }}
-              className="glass-card-hover p-6 group cursor-pointer"
+              className={`glass-card-hover p-6 group ${pub.link ? 'cursor-pointer' : ''}`}
+              onClick={() => handleClick(pub)}
             >
               <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-secondary/20 text-secondary mb-4">
                 {pub.category}
@@ -107,17 +130,31 @@ export default function Insights() {
                 {pub.title}
               </h3>
               <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                {pub.excerpt}
+                {pub.abstract}
               </p>
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {pub.date}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" />
-                  {pub.readTime}
-                </span>
+                {pub.date && (
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {pub.date}
+                  </span>
+                )}
+                {pub.readTime && (
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    {pub.readTime}
+                  </span>
+                )}
+                {pub.status === 'published' && pub.link && (
+                  <span className="inline-flex items-center gap-1 text-primary font-medium ml-auto">
+                    Read <ArrowUpRight className="w-3 h-3" />
+                  </span>
+                )}
+                {pub.status !== 'published' && (
+                  <span className="text-yellow-400/70 ml-auto text-xs">
+                    {pub.status === 'in-preparation' ? 'In preparation' : 'Working paper'}
+                  </span>
+                )}
               </div>
             </motion.article>
           ))}
