@@ -3,7 +3,7 @@
  * Author: Angus Ng
  * Version: v1.0 (Preliminary)
  * 
- * Publication #2 in Uncertainty Lab — lecture notes developing a nonparametric
+ * Publication #2 in Uncertainty Lab — paper developing a nonparametric
  * framework for two-sample testing on distributions of stochastic processes
  * using signature kernels and MMD.
  * 
@@ -157,7 +157,7 @@ export default function StatisticalInferencePathSpace() {
           {/* Context Note */}
           <div className="research-context-note">
             <p>
-              <strong>Note:</strong> These lecture notes serve as a mathematical and conceptual foundation 
+              <strong>Note:</strong> This paper serves as a mathematical and conceptual foundation 
               for later work in Uncertainty Lab, including signature-based calibration, kernel two-sample 
               testing on financial time series, and nonparametric inference on volatility dynamics.
             </p>
@@ -171,7 +171,7 @@ export default function StatisticalInferencePathSpace() {
               <span className="research-badge research-badge-published">Published (Preliminary)</span>
               <span className="research-badge research-badge-version">v1.0</span>
             </div>
-            <p className="meta">2026 · Uncertainty Lab · Lecture Notes</p>
+            <p className="meta">2026 · Uncertainty Lab</p>
           </header>
 
           {/* Tags */}
@@ -801,7 +801,7 @@ export default function StatisticalInferencePathSpace() {
             <h3><Quote size={18} /> Cite This Paper</h3>
             <div className="citation-text">
               <p>Angus Ng (2026). <em>Statistical Inference on Path Space via Rough Paths and Kernel Methods</em>.</p>
-              <p>Uncertainty Lab Lecture Notes. v1.0 (Preliminary).</p>
+              <p>Uncertainty Lab. v1.0 (Preliminary).</p>
               <p className="url">https://angusmit.github.io/uncertaintylab/publications/statistical-inference-path-space</p>
             </div>
           </div>
